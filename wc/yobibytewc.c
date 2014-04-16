@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #define NUM_OF_STRINGS ((const unsigned char) 'l')
 #define NUM_OF_BYTES ((const unsigned char) 'c')
@@ -146,32 +147,42 @@ int main(int argc, char *argv[]) {
 	}	
 
 	if((numOfKeys == 0)) {
+
 		for(i=0; i < numOfFiles; i++) {
 			currFileName = fileList[j];	
+			
+		if( access(currFileName, F_OK ) != -1 ) {	
 			getAllKeys(fileList[i]);
+		} else {
+		  printf("There is no file %s or you have no access to it.\n", currFileName);
 		}
 
-		if(numOfFiles > 1) {
+		  if(numOfFiles > 1) {
 			printf("% 5d", totalStrings);
 			printf("% 5d", totalWords);
 			printf("% 5d ", totalBytes);
 			printf("total\n");
+	  	  }
 		}
 		return 0;
 	}	
 	
 	for (j = 0; j < numOfFiles; j++) {
-		currFileName = fileList[j];	
-		for (i = 0; i < numOfKeys; i++) {
-		FILE *currFile = fopen(currFileName, READ_MODE);
+		currFileName = fileList[j];
+		if( access(currFileName, F_OK ) != -1 ) {	
+	          for (i = 0; i < numOfKeys; i++) {
+		  FILE *currFile = fopen(currFileName, READ_MODE);
 			char currKey = keyList[i];
 			useKey(currKey, currFile);
-		}
-		printf(" ");
-		printf(currFileName);
-		printf("\n");
+		  }
+		  printf(" ");
+		  printf(currFileName);
+		  printf("\n");
+		} else {
+                  printf("File %s doesn't exist or you have no access to it\n", currFileName);
+		}	
 	}
-
+/*
 	if(numOfFiles > 1) {
 		for (i = 0; i < numOfKeys; i++) {
 			char currKey = keyList[i];
@@ -195,7 +206,7 @@ int main(int argc, char *argv[]) {
 		}
 		printf("total\n");
 	}	
-
+*/
 	return 0;
 }
 //TODO make same flags parsing
