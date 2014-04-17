@@ -11,7 +11,8 @@
 
 void printFolder(char *currPath) {
 	DIR *currDir;
-	currDir = opendir(currPath);
+
+  currDir = opendir(currPath);
 	struct dirent *dp;
 
 	char *dot = ".";
@@ -37,8 +38,12 @@ void printFolder(char *currPath) {
 		}	
 
 		if(strcmp(dot,dp->d_name)&&strcmp(doubleDot,dp->d_name)) {
-		  int status = 0;
-	
+		  int status = 1;
+               
+		  char* currFilePath [PATH_MAX];
+		  *currFilePath = strdup(currPath);
+		  strcat(*currFilePath, "/");
+		  strcat(*currFilePath, dp->d_name);
 
 
 		  printf( (S_ISDIR(st.st_mode)) ? "d" : "-");
@@ -54,10 +59,6 @@ void printFolder(char *currPath) {
 		  printf("\t");
 
 
-		  char* currFilePath [PATH_MAX];
-		  *currFilePath = strdup(currPath);
-		  strcat(*currFilePath, "/");
-		  strcat(*currFilePath, dp->d_name);
 		
 		
 		  printf("%d ", status);
@@ -76,7 +77,7 @@ void printFolder(char *currPath) {
 		  g = getgrgid(st.st_gid);
 		  printf("%s\t",g->gr_name);
 		  
-
+ 		  
 
 
 	 	  struct tm ts;
@@ -88,7 +89,9 @@ void printFolder(char *currPath) {
 
 		  printf(dp->d_name);
 	          printf("\n");
-		}
+
+}
+	
 	}
 
 	int i;
