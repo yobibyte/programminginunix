@@ -66,7 +66,7 @@ void printFolder(char *currPath) {
 		  printf("\t");
 		
 		
-		  printf("%ld ", st.st_nlink);
+		  printf("%ld ", (long) st.st_nlink);
 
 		  int size = st.st_size;
 		  printf("%d", size);	
@@ -74,12 +74,12 @@ void printFolder(char *currPath) {
 
 		  struct passwd *pwd;
 		  pwd = getpwuid(st.st_uid);
-		  printf("%s\t",pwd->pw_name);
+      pwd == NULL ? fprintf(stderr, "There is no user with %ld uid", (long) st.st_uid):printf("%s\t", pwd->pw_name);
 		  
 					  
      	          struct group *g;
 		  g = getgrgid(st.st_gid);
-		  printf("%s\t",g->gr_name);
+      g == NULL ? fprintf(stderr, "There is no group with %ld gid",(long) st.st_gid):printf("%s\t",g->gr_name);
 		  
 	 	  struct tm ts;
 		  char buf[80];
