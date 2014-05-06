@@ -8,19 +8,23 @@
 #include<time.h>
 #include<pwd.h>
 #include <grp.h>
+#include <errno.h>
 
 void printFolder(char *currPath) {
 	DIR *currDir;
-
   currDir = opendir(currPath);
 	struct dirent *dp;
-
 	char *dot = ".";
 	char *doubleDot = "..";
 	char **pathArray = NULL;
 	int numOfFolders = 0;
 
 	struct stat st;
+
+  if(currDir == NULL) {
+    fprintf(stderr,"Input file doesn't exist or you have no access to it\n");
+    return;
+  }
 
 	while ((dp = readdir(currDir)) != NULL) {
 
@@ -45,7 +49,7 @@ void printFolder(char *currPath) {
 		  strcat(*currFilePath, "/");
 		  strcat(*currFilePath, dp->d_name);
 
-	  	  stat(dp->d_name, &st);
+	  	stat(dp->d_name, &st);
 
  
 		  printf( (S_ISDIR(st.st_mode)) ? "d" : "-");
@@ -77,9 +81,6 @@ void printFolder(char *currPath) {
 		  g = getgrgid(st.st_gid);
 		  printf("%s\t",g->gr_name);
 		  
- 		  
-
-
 	 	  struct tm ts;
 		  char buf[80];
 		  // Format time, "ddd yyyy-mm-dd hh:mm:ss zzz"
@@ -88,14 +89,13 @@ void printFolder(char *currPath) {
 		  printf("%s\t", buf);
 
 		  printf(dp->d_name);
-	          printf("\n");
+	    printf("\n");
 
-}
+    }  
 	
 	}
 
-	int i;
-	for(i = 0; i < numOfFolders; i++) {
+	for(int i = 0; i < numOfFolders; i++) {
 		printFolder(pathArray[i]);
 	}
 }
@@ -108,10 +108,7 @@ int main(int argc, char *argv[]) {
 	  char buf[PATH_MAX];
 	  getcwd(buf, sizeof(buf) != 0);
 	}	
-
   printFolder(currPath);
   return 0;
 }
 
-
-//TODO использовать stat вместо проверки прав и существования файла
