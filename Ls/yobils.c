@@ -10,6 +10,7 @@
 #include <grp.h>
 #include <errno.h>
 
+
 void printFolder(char *currPath) {
 	DIR *currDir;
   currDir = opendir(currPath);
@@ -42,7 +43,6 @@ void printFolder(char *currPath) {
 		}	
 
 		if(strcmp(dot,dp->d_name)&&strcmp(doubleDot,dp->d_name)) {
-		  int status = 1;
                
 		  char* currFilePath [PATH_MAX];
 		  *currFilePath = strdup(currPath);
@@ -66,7 +66,7 @@ void printFolder(char *currPath) {
 		  printf("\t");
 		
 		
-		  printf("%d ", status);
+		  printf("%ld ", st.st_nlink);
 
 		  int size = st.st_size;
 		  printf("%d", size);	
