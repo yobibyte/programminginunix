@@ -20,7 +20,7 @@ char** parsePatterns(char* source) {
 }
 
 int checkLine(char* line) {
-  return;
+  return 1;
 }
 
 int main(int argc, char** argv) {
@@ -38,15 +38,22 @@ int main(int argc, char** argv) {
 
   char c = getc(inputStream);
   while(c != EOF) {
-    char* currLine;
+    char* currLine = NULL;
     int wordLength = 0;
-    while(c != '\n') {
+    while(1) {
       currLine = (char*) realloc(currLine, (wordLength + 1) * sizeof(char));
       currLine[wordLength] = c;
       c = getc(inputStream);
+
+      if(currLine[wordLength] == '\n') {
+        break;
+      }
+
       wordLength++;
     }
-    printf(currLine);
+    if(checkLine(currLine)) {
+      printf(currLine);
+    }
   }
 
   return 0;
