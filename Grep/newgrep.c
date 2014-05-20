@@ -89,52 +89,61 @@ Pattern* parsePatterns(char* source) {
 
 
 int checkLine(Pattern* patterns, char* line) {
-  int sourceLen = strlen(line);
-  int ctr = 0;
- 
 
-  for(int i = 0; i < numOfPatterns; i++) {
+  int strCtr, ptrnCtr, matchCtr;
+  strCtr = ptrnCtr = matchCtr = 0;
 
-    if(ctr > sourceLen) {
-      fprintf(stderr, "Check you pattern! Something is wrong with it.");//TODO add throwing exception
-    }
-
+  while(1) {
     
-    Pattern cp = patterns[i];
-  
-    int matchCtr = 0;
-    while(1) {
-      if(cp.right == NULL) {
-        if(cp.type == NULL) {
-          if(cp.left[0] != line[ctr]) {
-            return 0;
-          } else {
-            ctr++;
-          }
-        } else if(cp.right == '*') {
-          if(cp.right[0] == line[ctr]) {
-            matchCtr++;
-            ctr++;
-            continue;
-          } else {
-            break;
-          }
-        } else if(cp.right == '?') {
-          if(cp.right[0] == line[ctr] && matchCtr == 0) {    
-            if(cp.left[0] != line[ctr]) {
-              return 0;
-            } else {
-              ctr++;
-            }
-          } else {
-            break;
-          }
+    if(ptrnCtr == numOfPatterns) {
+      return 1;
+    }
+    
+    Pattern p = patterns[ptrnCtr];
+    
+    if(p.type == '\0') {
+      if(p.right == NULL) {
+        char* substr[strlen(p.left) + 1];
+        memcpy(&substr, p.left, strlen(p.left));
+        substr[strlen(p.left)] = '\0';
+        if(strcmp(substr, p.left)) {
+          strCtr += strlen(p.left);
+          ptrnCtr++;
+        } else {
+          break;  
+        }  
+      } else {
+        char c = line[strCtr];
+        if(c >= p.left[0] && c <= p.right[0]) {
+          strCtr++;
+          ptrnCtr++;
+        } else {
+          break;
         }
       }
-    }  
+    } else if(p.type == '*') {
+      if(p.right == NULL) {
+        
+      } else {
+      
+      }
+    } else if(p.type == '?') {
+      if(p.right == NULL) {
+        
+      } else {
+      
+      }
+    }
   }
 
-  return 1;
+
+  if(strlen(line) > 0) {
+    if(checkLine(patterns, line)) {
+      return 1;
+    }
+  }
+
+  return 0;
 }
 
 void testParcePatterns(char* input) {
@@ -162,11 +171,10 @@ int main(int argc, char** argv) {
     inputStream = stdin;
   }
 
-  //Pattern* patterns = parsePatterns(argv[PATTERN]);  
+  Pattern* patterns = parsePatterns(argv[PATTERN]);  
 
-  testParcePatterns("a*[bc]c?[b-c][bc-]");
-
-  /*
+  //testParcePatterns("a*[bc]c?[b-c][bc-]");
+  
   char c = getc(inputStream);
   while(c != EOF) {
     char* currLine = NULL;
@@ -184,7 +192,7 @@ int main(int argc, char** argv) {
       printf(currLine);
     }
   }
-  */
+  
   return 0;
 }
 //TODO add search of substirng in string, not exact search as is
