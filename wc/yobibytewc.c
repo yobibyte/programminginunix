@@ -218,5 +218,3 @@ int main(int argc, char *argv[]) {
 //makefile
 //getopt
 //long keys --ws
-//TODO recursive ls -lR
-//grep
