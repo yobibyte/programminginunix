@@ -26,7 +26,6 @@ Pattern* parsePatterns(char* source) {
 
   while(1) {
 
-
     Pattern cp;
     cp.left = NULL;
     cp.right = NULL;    
@@ -92,7 +91,7 @@ int checkLine(Pattern* patterns, char* line) {
 
   int strCtr, ptrnCtr, matchCtr;
   strCtr = ptrnCtr = matchCtr = 0;
-
+  printf("%s\n",line);
   while(1) {
     
     if(ptrnCtr == numOfPatterns) {
@@ -102,6 +101,7 @@ int checkLine(Pattern* patterns, char* line) {
     Pattern p = patterns[ptrnCtr];
     
     if(p.type == '\0') {
+
       if(p.right == NULL) {
         char* substr[strlen(p.left) + 1];
         memcpy(&substr, p.left, strlen(p.left));
@@ -160,6 +160,11 @@ void testParcePatterns(char* input) {
 
 int main(int argc, char** argv) {
 
+  if(argc == 1) {
+    fprintf(stderr, "You didn't provide any pattern.\n");
+    return 1;
+  }
+
   FILE* inputStream;
   if(argc > 2) {
     inputStream = openFile(argv[FILEPATH]);
@@ -183,14 +188,15 @@ int main(int argc, char** argv) {
       currLine = (char*) realloc(currLine, (wordLength + 1) * sizeof(char));
       currLine[wordLength] = c;
       c = getc(inputStream);
-      if(currLine[wordLength] == '\n') {
+      if(c == '\n' || c == EOF)  {    
+        if(checkLine(patterns, currLine)) {
+          printf(currLine);
+        }
         break;
       }
       wordLength++;
     }
-    if(checkLine(patterns, currLine)) {
-      printf(currLine);
-    }
+   
   }
   
   return 0;
