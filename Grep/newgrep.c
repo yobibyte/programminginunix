@@ -23,7 +23,6 @@ Pattern* parsePatterns(char* source) {
   int sourceLen = strlen(source);
   Pattern* patterns = NULL;
   int ctr = 0;
-
   while(1) {
 
     Pattern cp;
@@ -36,9 +35,7 @@ Pattern* parsePatterns(char* source) {
       cp.left = malloc(sizeof(char) * 2);
       cp.left[0] = source[ctr];
     //Here we try to parse patterns of type: [ab]?, [ab]*, [a-b]?, [a-b]*, [ab], [a-b]
-    } 
-    
-    else { 
+    }  else { 
       int isLeft = 1;
       int wordLen = 0; //to store length of right of left part o a pattern, i.e [a-b] left part is 1 and right part is 1;
       while(source[++ctr] != ']') {
@@ -75,9 +72,10 @@ Pattern* parsePatterns(char* source) {
     patternsArraySize += sizeof(cp);
     patterns = realloc(patterns, patternsArraySize);
     patterns[numOfPatterns] = cp;
-    
+    numOfPatterns++; 
+
     if(ctr > sourceLen) {    
-      numOfPatterns++;
+      numOfPatterns--;
       break;
     }
     
@@ -181,11 +179,11 @@ int main(int argc, char** argv) {
     inputStream = stdin;
   }
 
-  Pattern* patterns = parsePatterns(argv[PATTERN]);  
+  //Pattern* patterns = parsePatterns(argv[PATTERN]);  
   
-  //testParcePatterns(argv[PATTERN]);
+  testParcePatterns(argv[PATTERN]);
   //testParcePatterns("a*[bc]c?[b-c][bc-]");
-  
+ /* 
   char c = getc(inputStream);
   while(c != EOF) {
     char* currLine = NULL;
@@ -204,7 +202,7 @@ int main(int argc, char** argv) {
     }
    
   }
-  
+  */
   return 0;
 }
 //TODO add search of substirng in string, not exact search as is
