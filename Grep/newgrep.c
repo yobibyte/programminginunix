@@ -75,9 +75,9 @@ Pattern* parsePatterns(char* source) {
     patternsArraySize += sizeof(cp);
     patterns = realloc(patterns, patternsArraySize);
     patterns[numOfPatterns] = cp;
-    numOfPatterns++;
     
-    if(ctr > sourceLen) {
+    if(ctr > sourceLen) {    
+      numOfPatterns++;
       break;
     }
     
@@ -91,7 +91,6 @@ int checkLine(Pattern* patterns, char* line) {
 
   int strCtr, ptrnCtr, matchCtr;
   strCtr = ptrnCtr = matchCtr = 0;
-  printf("%s\n",line);
   while(1) {
     
     if(ptrnCtr == numOfPatterns) {
@@ -101,12 +100,16 @@ int checkLine(Pattern* patterns, char* line) {
     Pattern p = patterns[ptrnCtr];
     
     if(p.type == '\0') {
-
       if(p.right == NULL) {
         char* substr[strlen(p.left) + 1];
         memcpy(&substr, p.left, strlen(p.left));
         substr[strlen(p.left)] = '\0';
-        if(strcmp(substr, p.left)) {
+        
+        char strr[sizeof(p.left)/sizeof(char) + 1];
+        strr[sizeof(p.left)/sizeof(char)] = '\0';
+        printf("%s\t %d\n", p.left, strlen(strr));
+        
+        if(strcmp(substr, p.left)) { 
           strCtr += strlen(p.left);
           ptrnCtr++;
         } else {
@@ -136,9 +139,11 @@ int checkLine(Pattern* patterns, char* line) {
     }
   }
 
-
   if(strlen(line) > 0) {
-    if(checkLine(patterns, line)) {
+    char substr[strlen(line)];
+    memcpy(&substr, line, strlen(line) - 1);
+    substr[strlen(line)- 1] = '\0';
+    if(checkLine(patterns, substr)) {
       return 1;
     }
   }
@@ -151,9 +156,9 @@ void testParcePatterns(char* input) {
   Pattern* patterns = parsePatterns(input);
 
   printf("Your pattern: %s\n", input);
-  printf("You have %d patterns\n", numOfPatterns - 1);
+  printf("You have %d patterns\n", numOfPatterns);
 
-  for(int i = 0; i < numOfPatterns - 1; i++) {
+  for(int i = 0; i < numOfPatterns; i++) {
     printf("Pattern %d\t Left: %s\t Right: %s\t Type: %c\n", i+1, patterns[i].left, patterns[i].right, patterns[i].type);
   }
 }
@@ -177,7 +182,8 @@ int main(int argc, char** argv) {
   }
 
   Pattern* patterns = parsePatterns(argv[PATTERN]);  
-
+  
+  //testParcePatterns(argv[PATTERN]);
   //testParcePatterns("a*[bc]c?[b-c][bc-]");
   
   char c = getc(inputStream);
