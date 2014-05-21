@@ -126,19 +126,43 @@ int checkLine(Pattern* patterns, char* line) {
           break;
         }
       }
+    //needs debugging
     } else if(p.type == '*') {
       if(p.right == NULL) {
-        
+        char substr[strlen(p.left) + 1];
+        memcpy(&substr, line + sizeof(char) * strCtr, strlen(p.left));
+        substr[strlen(p.left)] = '\0';
+          
+        if(strcmp(substr, p.left) == 0) { 
+          strCtr += strlen(p.left);
+        } else {
+          ptrnCtr++;
+        }
       } else {
-      
+        //two part pattern here 
       }
     } else if(p.type == '?') {
-      if(p.right == NULL) {
-        
+      if(p.right == NULL) { 
+        char substr[strlen(p.left) + 1];
+        memcpy(&substr, line + sizeof(char) * strCtr, strlen(p.left));
+        substr[strlen(p.left)] = '\0';
+          
+        if(strcmp(substr, p.left) == 0) { 
+          if(matchCtr < 2) {
+            matchCtr++;
+            strCtr += strlen(p.left);
+          } else {
+            matchCtr = 0;
+            ptrnCtr++;
+          }
+        } else {
+          matchCtr = 0;
+          ptrnCtr++;
+        }
       } else {
-      
+        //two part patterns here 
       }
-    }
+    }//finished needs debugging
   }
 
   if(strlen(line) > 0) {
