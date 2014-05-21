@@ -94,6 +94,7 @@ int checkLine(Pattern* patterns, char* line) {
 
   int strCtr, ptrnCtr, matchCtr;
   strCtr = ptrnCtr = matchCtr = 0;
+  
   while(1) {
     
     if(ptrnCtr == numOfPatterns) {
@@ -104,17 +105,13 @@ int checkLine(Pattern* patterns, char* line) {
     
     if(p.type == '\0') {
       if(p.right == NULL) {
-        char* substr[strlen(p.left) + 1];
-        memcpy(&substr, p.left, strlen(p.left));
-        substr[strlen(p.left)] = '\0';
         
-        char strr[strlen(p.left) + 1];
-        memcpy(&strr, line+strCtr, strlen(p.left));
-        strr[strlen(p.left)] = '\0';
-
-        printf(substr);
-
-        if(strcmp(substr, p.left)) { 
+        char substr[strlen(p.left) + 1];
+        memcpy(&substr, line + sizeof(char) * strCtr, strlen(p.left));
+        substr[strlen(p.left)] = '\0';
+         
+        printf("%s : %d\n", line, strlen(line));
+        if(strcmp(substr, p.left) == 0) { 
           strCtr += strlen(p.left);
           ptrnCtr++;
         } else {
@@ -143,16 +140,16 @@ int checkLine(Pattern* patterns, char* line) {
       }
     }
   }
-
+/*
   if(strlen(line) > 0) {
-    char substr[strlen(line)];
-    memcpy(&substr, line, strlen(line) - 1);
-    substr[strlen(line)- 1] = '\0';
+    char substr[strlen(line) + 1];
+    memcpy(&substr, line, strlen(line));
+    substr[strlen(line)] = '\0';
     if(checkLine(patterns, substr)) {
       return 1;
     }
   }
-
+*/
   return 0;
 }
 
@@ -164,7 +161,6 @@ void testParcePatterns(char* input) {
   printf("You have %d patterns\n", numOfPatterns);
 
   for(int i = 0; i < numOfPatterns; i++) {
-//    printf(patterns[i].right);
     printf("Pattern %d\t Left: %s\t Right: %s\t Type: %c\n", i+1, patterns[i].left, patterns[i].right, patterns[i].type);
   }
 }
@@ -197,18 +193,19 @@ int main(int argc, char** argv) {
     char* currLine = NULL;
     int wordLength = 0;
     while(1) {
-      currLine = (char*) realloc(currLine, (wordLength + 1) * sizeof(char));
+      currLine = (char*) realloc(currLine, (wordLength + 2) * sizeof(char));
       currLine[wordLength] = c;
+      currLine[wordLength+1] = '\0';
       c = getc(inputStream);
-      if(c == '\n' || c == EOF)  {    
+      if(c == '\n' || c == EOF)  {
         if(checkLine(patterns, currLine)) {
-          printf(currLine);
+          printf("%s\n",currLine);
         }
         break;
       }
       wordLength++;
     }
-   
+    c = getc(inputStream); 
   }
   
   return 0;
