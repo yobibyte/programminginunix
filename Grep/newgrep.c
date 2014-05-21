@@ -109,12 +109,12 @@ int checkLine(Pattern* patterns, char* line) {
         char substr[strlen(p.left) + 1];
         memcpy(&substr, line + sizeof(char) * strCtr, strlen(p.left));
         substr[strlen(p.left)] = '\0';
-         
-        printf("%s : %d\n", line, strlen(line));
+        
         if(strcmp(substr, p.left) == 0) { 
           strCtr += strlen(p.left);
           ptrnCtr++;
         } else {
+          strCtr += strlen(p.left);
           break;  
         }  
       } else {
@@ -140,16 +140,16 @@ int checkLine(Pattern* patterns, char* line) {
       }
     }
   }
-/*
+
   if(strlen(line) > 0) {
-    char substr[strlen(line) + 1];
-    memcpy(&substr, line, strlen(line));
+    char substr[strlen(line)];
+    memcpy(&substr, line + sizeof(char)*strCtr, strlen(line));
     substr[strlen(line)] = '\0';
     if(checkLine(patterns, substr)) {
       return 1;
     }
   }
-*/
+
   return 0;
 }
 
