@@ -34,6 +34,7 @@ Pattern* parsePatterns(char* source) {
     if(source[ctr] != '[') { 
       cp.left = malloc(sizeof(char) * 2);
       cp.left[0] = source[ctr];
+      cp.left[1] = '\0';
     //Here we try to parse patterns of type: [ab]?, [ab]*, [a-b]?, [a-b]*, [ab], [a-b]
     }  else { 
       int isLeft = 1;
@@ -46,15 +47,19 @@ Pattern* parsePatterns(char* source) {
           isLeft = 0;
           wordLen = 0;
           continue;
-        }
+        } 
+        
         if(isLeft == 1) {
-          cp.left = (char*) realloc(cp.left, (wordLen + 1) * sizeof(char));
+          cp.left = (char*) realloc(cp.left, (wordLen + 2) * sizeof(char));
           cp.left[wordLen] = source[ctr];
+          cp.left[wordLen + 1] = '\0';
           wordLen++;
           continue;
         } else {
-          cp.right = (char*) realloc(cp.right, (wordLen + 1) * sizeof(char));
+          
+          cp.right = (char*) realloc(cp.right, (wordLen + 2) * sizeof(char));
           cp.right[wordLen] = source[ctr];
+          cp.right[wordLen + 1] = '\0';
           wordLen++;
           continue;
         }
@@ -103,10 +108,12 @@ int checkLine(Pattern* patterns, char* line) {
         memcpy(&substr, p.left, strlen(p.left));
         substr[strlen(p.left)] = '\0';
         
-        char strr[sizeof(p.left)/sizeof(char) + 1];
-        strr[sizeof(p.left)/sizeof(char)] = '\0';
-        printf("%s\t %d\n", p.left, strlen(strr));
-        
+        char strr[strlen(p.left) + 1];
+        memcpy(&strr, line+strCtr, strlen(p.left));
+        strr[strlen(p.left)] = '\0';
+
+        printf(substr);
+
         if(strcmp(substr, p.left)) { 
           strCtr += strlen(p.left);
           ptrnCtr++;
@@ -157,6 +164,7 @@ void testParcePatterns(char* input) {
   printf("You have %d patterns\n", numOfPatterns);
 
   for(int i = 0; i < numOfPatterns; i++) {
+//    printf(patterns[i].right);
     printf("Pattern %d\t Left: %s\t Right: %s\t Type: %c\n", i+1, patterns[i].left, patterns[i].right, patterns[i].type);
   }
 }
@@ -179,11 +187,11 @@ int main(int argc, char** argv) {
     inputStream = stdin;
   }
 
-  //Pattern* patterns = parsePatterns(argv[PATTERN]);  
+  Pattern* patterns = parsePatterns(argv[PATTERN]);  
   
-  testParcePatterns(argv[PATTERN]);
+  //testParcePatterns(argv[PATTERN]);
   //testParcePatterns("a*[bc]c?[b-c][bc-]");
- /* 
+  
   char c = getc(inputStream);
   while(c != EOF) {
     char* currLine = NULL;
@@ -202,9 +210,7 @@ int main(int argc, char** argv) {
     }
    
   }
-  */
+  
   return 0;
 }
-//TODO add search of substirng in string, not exact search as is
-//TODO add processing '-' as symbol if there is no symbols after it inside brackets
 //TODO add several files matching
