@@ -67,7 +67,7 @@ Pattern* parsePatterns(char* source) {
     }
 
     ctr++;
-
+    
     //set pattern type
     if(source[ctr] == '?' || source[ctr] == '*') {
       cp.type = source[ctr];
@@ -123,10 +123,10 @@ int checkLine(Pattern* patterns, char* line) {
           strCtr++;
           ptrnCtr++;
         } else {
+          strCtr++;
           break;
         }
       }
-    //needs debugging
     } else if(p.type == '*') {
       if(p.right == NULL) {
         char substr[strlen(p.left) + 1];
@@ -140,6 +140,12 @@ int checkLine(Pattern* patterns, char* line) {
         }
       } else {
         //two part pattern here 
+        char c = line[strCtr];
+        if(c >= p.left[0] && c <= p.right[0]) {
+          strCtr++;
+        } else {
+          ptrnCtr++;
+        }
       }
     } else if(p.type == '?') {
       if(p.right == NULL) { 
@@ -161,8 +167,20 @@ int checkLine(Pattern* patterns, char* line) {
         }
       } else {
         //two part patterns here 
+        char c = line[strCtr];
+        if(c >= p.left[0] && c <= p.right[0]) {
+          if(matchCtr < 2) {
+            matchCtr++;
+            strCtr ++;
+          } else {
+            matchCtr = 0;
+            ptrnCtr++;
+          }
+        } else {
+          matchCtr = 0;
+          ptrnCtr++;
+        }
       }
-    }//finished needs debugging
   }
 
   if(strlen(line) > 0) {
@@ -210,7 +228,9 @@ int main(int argc, char** argv) {
   Pattern* patterns = parsePatterns(argv[PATTERN]);  
   
   //testParcePatterns(argv[PATTERN]);
-  //testParcePatterns("a*[bc]c?[b-c][bc-]");
+  //testParcePatterns("a*[bc]*c?[b-c][bc-]");
+  //testParcePatterns("[a-b]*");
+  
   
   char c = getc(inputStream);
   while(c != EOF) {
