@@ -36,7 +36,7 @@ void read_write(int r_descriptor, int w_descriptor, int fsize) {
 			ptr += result;
 		} 
 	} while (byte);
-	printf("Sent file \n");
+	printf("Sent file \n");	
 }
 
 void send_file(char *name, int w_descriptor) {
@@ -59,11 +59,13 @@ void send_file(char *name, int w_descriptor) {
 	if (name_size < 0) {
 		perror("");
 	}
+	printf("HERE IS NAMELENTH %d\n", name_lenght);
+	
 
 	written = send(w_descriptor, name, (name_lenght)*sizeof(char), 0);
 	printf("%s\n", name);
 
-	if (written <0) {
+	if (written < 0) {
 		perror("");
 	}
 	fsize = send(w_descriptor, &file_stat.st_size, sizeof(file_stat.st_size), 0);
@@ -73,6 +75,7 @@ void send_file(char *name, int w_descriptor) {
 	printf("sending: %s\n", name);
 	read_write(file_descriptor, w_descriptor, fsize);
 	close(file_descriptor);
+
 }
 
 void recieve_filenames(w_descriptor) {
@@ -120,11 +123,10 @@ int main(int argc, char *argv[]){
 		exit(0);
 	}
 
-	// get ready to connect
-    if ((status = getaddrinfo(argv[1], argv[2], &hints, &res)) != 0) {
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
-        return 2;
-    }
+  if ((status = getaddrinfo(argv[1], argv[2], &hints, &res)) != 0) {
+		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
+  	return 2;
+  }
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = PF_INET;
 	hints.ai_socktype = SOCK_STREAM;
@@ -140,11 +142,9 @@ int main(int argc, char *argv[]){
 		exit(1);
 	}
 	printf("Please enter filenames you want to send to server: ");
+
 	while (1) {
-
-		
 	recieve_filenames(socket_descriptor);
-
 	}; 
 	close(socket_descriptor);
 	return 0;

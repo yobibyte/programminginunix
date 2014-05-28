@@ -16,33 +16,32 @@
 size_t meta;
 int socket_descriptor;
 int result;
-char *filename = NULL;
+char *filename;
 char **filenames;
 int status, sock;
 struct addrinfo hints;
 struct addrinfo *res;  // will point to the results
 
-void read_write(int r_descriptor, int w_descriptor, int fsize) {
-	char buff[fsize];
+void read_write(int r_descriptor, int w_descriptor, size_t fsize) {
+	char buff[BUF_SIZE];
 	char * ptr;
-	int result, out, byte;
-	do {
-		result = read(r_descriptor, buff, fsize);
+	int result, out, byte, sent_data = 0, counter = 0;
+	while (sent_data < fsize) {
+		counter = result = read(r_descriptor, buff, BUF_SIZE);
 		ptr = buff;
-		byte = result;
 		while (result){
 			out = write(w_descriptor, ptr, result);
 			result -= out;
 			ptr += result;
-		} 
-	} while (byte);
-	printf("Sent file \n");	
+		}
+		sent_data += counter;
+	}
+	printf("Sent file \n");
 }
 
 void send_file(char *name, int w_descriptor) {
-
 	int file_descriptor, written, name_size, fsize;
-	size_t name_lenght;
+	size_t name_lenght, *file_size;
 	struct stat file_stat;
 	file_descriptor = open(name, O_RDONLY);
 	if (file_descriptor < 0) {
@@ -50,46 +49,38 @@ void send_file(char *name, int w_descriptor) {
 		return;
 	}
 	name_lenght = strlen(name);
-	
 	if (fstat(file_descriptor, &file_stat) == -1) {
 		fprintf(stderr, "fstats: can't access %s\n", name);
 		return;
 	}
 	name_size = send(w_descriptor, &name_lenght, sizeof(name_lenght), 0);
-	if (name_size < 0) {
-		perror("");
+	if (name_size <0) {
+		perror("In sending name size");
 	}
-	printf("HERE IS NAMELENTH %d\n", name_lenght);
-	
-
-	written = send(w_descriptor, name, (name_lenght)*sizeof(char), 0);
-	printf("%s\n", name);
-
-	if (written < 0) {
-		perror("");
+	written = send(w_descriptor, name, name_lenght*sizeof(char), 0);
+	if (written <0) {
+		perror("In sending file name");
 	}
-	fsize = send(w_descriptor, &file_stat.st_size, sizeof(file_stat.st_size), 0);
+	file_size = &file_stat.st_size;
+	fsize = send(w_descriptor, file_size, sizeof(file_size), 0);
 	if (fsize < 0 ) {
-		perror("");
+		perror("In sending file size");
 	}
 	printf("sending: %s\n", name);
-	read_write(file_descriptor, w_descriptor, fsize);
+	read_write(file_descriptor, w_descriptor, *file_size);
 	close(file_descriptor);
-
 }
 
 void recieve_filenames(w_descriptor) {
-	int i = 0, j = 0, is_file_name = 0, file_name_len = 0, f_names_len = 0, write_desc;
+	int i = 0, is_file_name = 0, file_name_len = 0, f_names_len = 0;
 	char c;
 	filenames = (char **)malloc(sizeof(char *));
 	
 	while ((c = getchar()) != EOF) {
-
 		if (isspace(c)) {
 			if (!is_file_name) {
 				continue;
 			} else {
-
 				filename[file_name_len] = '\0';
 				is_file_name = file_name_len = 0;
 				filenames[f_names_len++] = filename;
@@ -106,11 +97,11 @@ void recieve_filenames(w_descriptor) {
 			filename = (char *)realloc(filename, sizeof(char)*file_name_len+1);
 		}
 	}
+	for (int i = 0; i < f_names_len; ++i)
+	{	
+		send_file(filenames[i], w_descriptor);
 
-	for (j = 0; j < f_names_len; ++j) {	
-		send_file(filenames[j], w_descriptor);
 	}
-
 	free(filenames);
 	free(filename);
 	
@@ -123,10 +114,11 @@ int main(int argc, char *argv[]){
 		exit(0);
 	}
 
-  if ((status = getaddrinfo(argv[1], argv[2], &hints, &res)) != 0) {
-		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
-  	return 2;
-  }
+	// get ready to connect
+    if ((status = getaddrinfo(argv[1], argv[2], &hints, &res)) != 0) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
+        return 2;
+    }
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = PF_INET;
 	hints.ai_socktype = SOCK_STREAM;
@@ -142,9 +134,10 @@ int main(int argc, char *argv[]){
 		exit(1);
 	}
 	printf("Please enter filenames you want to send to server: ");
-
 	while (1) {
+		
 	recieve_filenames(socket_descriptor);
+
 	}; 
 	close(socket_descriptor);
 	return 0;
