@@ -7,6 +7,7 @@
 #include <sys/fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #define BUF_SIZE 1024
 #define CLOSE_CMD "q"
@@ -27,7 +28,7 @@ char *fullpath;
 int main(){
 	char *file_name;
 	size_t file_name_size, file_size;
-	int fnsize, fsize, fd, stop_signal;
+	int fnsize, fsize, stop_signal;
 	fullpath = NULL;
 	fullpath = (char *)realloc(fullpath, strlen(DIRECTORY));
 	/* creating directory for copies */
@@ -75,7 +76,7 @@ int main(){
 			printf("initial stop_signal %d\n", stop_signal);
 			while (stop_signal > 0) {
 				bleft = (stop_signal - BUF_SIZE > 0) ? BUF_SIZE : stop_signal;
-				printf("count bleft %d\n", bleft);
+				printf("count bleft %lu\n", bleft);
 				if ((result = read(client_descriptor, buf, bleft)) < 0) {
 					perror("In read client descriptor");
 					break;
@@ -88,7 +89,7 @@ int main(){
 						break;
 					}
 					blleft -= w;
-					printf("written file %d\n", blleft);
+					printf("written file %lu\n", blleft);
 				}
 				
 				// bleft -= result;

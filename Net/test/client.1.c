@@ -25,7 +25,7 @@ struct addrinfo *res;  // will point to the results
 void read_write(int r_descriptor, int w_descriptor, size_t fsize) {
 	char buff[BUF_SIZE];
 	char* ptr;
-	int result, out, sent_data = 0;
+	int result, out, sent_data = 0, counter = 0;
 	while (sent_data < fsize) {
 		result = read(r_descriptor, buff, BUF_SIZE);
 		sent_data += result;
