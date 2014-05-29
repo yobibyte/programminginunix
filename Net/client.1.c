@@ -97,8 +97,7 @@ void recieve_filenames(w_descriptor) {
 			filename = (char *)realloc(filename, sizeof(char)*file_name_len+1);
 		}
 	}
-	for (int i = 0; i < f_names_len; ++i)
-	{	
+	for (int i = 0; i < f_names_len; ++i) {	
 		send_file(filenames[i], w_descriptor);
 
 	}
@@ -114,12 +113,11 @@ int main(int argc, char *argv[]){
 		exit(0);
 	}
 
-	// get ready to connect
     if ((status = getaddrinfo(argv[1], argv[2], &hints, &res)) != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
         return 2;
     }
-	memset(&hints, 0, sizeof hints);
+	memset(&hints, 0, sizeof (hints));
 	hints.ai_family = PF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 
